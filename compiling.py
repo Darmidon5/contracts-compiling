@@ -1,48 +1,54 @@
 from openpyxl import load_workbook
 from docxtpl import DocxTemplate
 from json import loads
+from counterparty import Counterparty
 
 
-def compile_contracts():
+def get_paths():
     with open('json_data', 'r', encoding='utf-8') as file:
         paths = loads(file.readline().rstrip())
         xlpath = paths['xl']
         contractpath = paths['conctract']
         templatepath = paths['template']
+    return xlpath, contractpath, templatepath
 
-    # C:\Users\niks_\Downloads\тест_тестович
 
+def get_xl_data(xlpath):
     workbook = load_workbook(rf'{xlpath}.xlsx')
     sheet_1 = workbook['Лист1']
+    return sheet_1
 
-    for row in range(2, sheet_1.max_row + 1):
-        price = sheet_1.cell(row, 3)
-        amount = sheet_1.cell(row, 4)
-        total = int(price.value) * int(amount.value)
-        total_cell = sheet_1.cell(row, 8)
-        total_cell.value = total
 
-    # C:\Users\niks_\Downloads\тестович_тест
-    template = DocxTemplate(rf'{templatepath}.docx')
+def content_gathering(sheet):
     customers_data = []
-    for i in range(2, sheet_1.max_row + 1):
-        customers_data.append({
-            'name': sheet_1.cell(i, 2).value,
-            'company': sheet_1.cell(i, 1).value,
-            'start_date': sheet_1.cell(i, 5).value,
-            'end_date': sheet_1.cell(i, 6).value,
-            'total': sheet_1.cell(i, 8).value
-        })
+    columns = ['id', 'name', 'contract_date', 'representative_post', 'representative_name', 'representative_document',
+               'document_number', 'document_date', 'rental_period', 'rental_cost', 'VAT', 'security_payment',
+               'authorized_to_transfer_property', 'authorized_to_return_property', 'purposes_of_use',
+               'operating_address', 'address', 'post_address', 'phone_number', 'fax', 'email', 'OGRN', 'INN', 'KPP',
+               'payment_account', 'bank_name', 'bank_name', 'correspondent_account', 'BIK']
+    for i in range(3, sheet.max_row + 1):
+        company_data = dict()
+        for idx in range(1, len(columns)+1):
+            value = sheet.cell(i, idx).value
+            if value:
+                company_data[columns[idx-1]] = sheet.cell(i, idx).value
+
+        customers_data.append(Counterparty(company_data))
+
+    return customers_data
 
 
+def template_filling(templatepath, contractpath, customers_data):
+    template = DocxTemplate(rf'{templatepath}.docx')
     for customer in customers_data:
-        context = {
-            'name': customer['name'],
-            'company': customer['company'],
-            'start_date': customer['start_date'],
-            'end_date': customer['end_date'],
-            'total': customer['total']
-        }
+        context = customer.__dict__
         template.render(context)
         # C:\Users\niks_\Desktop\тестим договоры
         template.save(rf'{contractpath}\{customer["name"]} договор.docx')
+
+
+def compile_contracts():
+    xlpath, contractpath, templatepath = get_paths()
+    sheet = get_xl_data(xlpath)
+    customers_data = content_gathering(sheet)
+    template_filling(templatepath, contractpath, customers_data)

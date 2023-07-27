@@ -48,9 +48,3 @@ class Counterparty:
             if not callable(getattr(self, attr)) and not attr.startswith('__') and '_' not in str(dict_of_values[attr]):
                 output += f' {attr}: {dict_of_values[attr]}'
         return output
-
-
-
-
-some_random_shit = Counterparty(id=3, BIK=12345678)
-print(some_random_shit)
