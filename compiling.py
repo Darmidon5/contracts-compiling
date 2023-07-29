@@ -1,8 +1,8 @@
 from openpyxl import load_workbook
 from docxtpl import DocxTemplate
-from json import loads
+from json import loads, dumps
 from counterparty import Counterparty
-
+from re import sub
 
 def get_paths():
     with open('json_data', 'r', encoding='utf-8') as file:
@@ -33,6 +33,7 @@ def content_gathering(sheet):
             if value:
                 company_data[columns[idx-1]] = sheet.cell(i, idx).value
 
+        company_data = dumps(company_data)
         customers_data.append(Counterparty(company_data))
 
     return customers_data
@@ -44,7 +45,8 @@ def template_filling(templatepath, contractpath, customers_data):
         context = customer.__dict__
         template.render(context)
         # C:\Users\niks_\Desktop\тестим договоры
-        template.save(rf'{contractpath}\{customer["name"]} договор.docx')
+        name = sub('"', '', customer.name)
+        template.save(rf'{contractpath}\{name} договор.docx')
 
 
 def compile_contracts():
