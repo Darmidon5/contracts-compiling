@@ -1,45 +1,49 @@
+from json import loads
+
 
 class Counterparty:
-    def __init__(self, **kwargs):
+    def __init__(self, json_dict):
         client_data_defaults = {
-            'id': '___',
-            'name': '_______________________',
-            'contract_date': '"___"________ ___г.',
+            'id': '________',
+            'name': '___________________________',
+            'contract_date': '"____"__________ ____г.',
 
-            'representative_post': '_______________________',
-            'representative_name': '_______________________',
-            'representative_document': '______________________________________________',
+            'representative_post': '                (должность)                ',
+            'representative_name': '                                (Ф.И.О.)                                ',
+            'representative_document': '     (наименование документа, подтверждающего полномочия)     ',
             'document_number': '_________',
-            'document_date': '"___"________ ___г.',
+            'document_date': '"____"__________ ____г.',
 
-            'rental_period': '_______________',
-            'rental_cost': '__________(_______)',
-            'VAT': '__________(_______)',
-            'security_payment': '_______________',
+            'rental_period': '__________________',
+            'rental_cost': '______ (_______)',
+            'VAT': '_________(_____________)',
+            'security_payment': '______________________',
 
-            'authorized_to_transfer_property': '______________________________________________',
-            'authorized_to_return_property': '______________________________________________',
+            'authorized_to_transfer_property': '______________________________',
+            'authorized_to_return_property': '______________________________',
 
-            'purposes_of_use': '___________________________________',
+            'purposes_of_use': '______________________________',
             'operating_address': '___________________________________',
 
-            'address': '___________________________________',
-            'post_address': '______________________________________________',
-            'phone_number': '______________',
-            'fax': '_____________',
-            'email': '_______________________',
+            'address': '',
+            'post_address': '',
+            'phone_number': '',
+            'fax': '',
+            'email_1': '___________________________',
+            'email_2': '',
 
-            'OGRN': '______________',
-            'INN': '__________',
-            'KPP': '_________',
+            'OGRN': '',
+            'INN': '',
+            'KPP': '',
 
-            'payment_account': '____________________',
-            'bank_name': '______________________________________________',
-            'correspondent_account': '____________________',
-            'BIK': '________',
+            'payment_account': '',
+            'bank_name': '',
+            'correspondent_account': '',
+            'BIK': '',
         }
+        json_dict = loads(json_dict)
         for client_data, default in client_data_defaults.items():
-            setattr(self, client_data, kwargs.get(client_data, default))
+            setattr(self, client_data, json_dict.get(client_data, default))
 
     def __repr__(self):
         dict_of_values = self.__dict__
@@ -52,5 +56,3 @@ class Counterparty:
 
 
 
-some_random_shit = Counterparty(id=3, BIK=12345678)
-print(some_random_shit)
